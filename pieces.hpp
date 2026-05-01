@@ -1,9 +1,8 @@
 #include <iostream>
 #include <vector>
-#include <list>
 
-typedef unsigned __int8 Square;
-typedef unsigned __int64 BitBoard;
+typedef uint8_t Square;
+typedef uint64_t BitBoard;
 
 enum PieceTypes {
     KNIGHT,
@@ -11,7 +10,8 @@ enum PieceTypes {
     KING,
     QUEEN,
     BISHOP,
-    ROOK
+    ROOK,
+    null
 };
 typedef enum PieceTypes PieceType;
 class Move {
@@ -20,14 +20,17 @@ class Move {
         Square NewSquare;
         PieceType MovedPiece;
 };
+typedef std::vector<Move> MoveList;
 class Piece {
     public:
         Square PieceSquare;
         bool Has_Moved;
 
         BitBoard Attacks;
-        std::list<Move> MoveList;
+        MoveList* PossibleMoves;
+
         
+
     private:
         char type;
 };
@@ -50,3 +53,14 @@ typedef struct {
     Side Black;
     unsigned char EnPassantSquares;
 } Position;
+
+namespace SquareFuncs{
+    bool DoesSquareExist(Square TheSquare) {return 1 <= TheSquare <= 64;}
+
+}
+namespace LegalMoves
+{
+    void GetKnightMoves(Piece ThePiece) {
+
+    }
+}
