@@ -29,7 +29,8 @@ class Piece {
         BitBoard Attacks;
         MoveList* PossibleMoves;
 
-        
+        BitBoard ValidSquares;
+        //For absolute pins and (presumably) other stuff
 
     private:
         char type;
@@ -39,6 +40,7 @@ class Side {
     public:
         std::vector<Piece> PieceList;
         BitBoard PieceLocations;
+        BitBoard GlobalValidSquares;
 };
 
 typedef struct {
@@ -57,10 +59,25 @@ typedef struct {
 namespace SquareFuncs{
     bool DoesSquareExist(Square TheSquare) {return 1 <= TheSquare <= 64;}
 
+    BitBoard GetBBSpot(Square TheSquare) {return (1 << TheSquare);}
+
+    BitBoard GetLimitingBB(Position CurPosition, Piece ThePiece) {
+        Square PieceSquare = ThePiece.PieceSquare;
+
+        BitBoard OpposingBB = (CurPosition.White.PieceLocations & GetBBSpot(PieceSquare))
+         ? CurPosition.White.PieceLocations : CurPosition.Black.PieceLocations;
+        //Note to self: if the piece locations are imprecise this function gets screwed up
+        
+        return OpposingBB & ThePiece.ValidSquares;
+    }
 }
 namespace LegalMoves
 {
-    void GetKnightMoves(Piece ThePiece) {
+    void AssignMoveList(MoveList* ptr, MoveList* NewMoves) {
+        free(ptr); ptr = NewMoves;
+    }
 
+    void GetKnightMoves(Piece ThePiece, Position CurPosition) {
+        
     }
 }
