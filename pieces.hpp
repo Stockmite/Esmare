@@ -1,8 +1,8 @@
 #include <iostream>
 #include <vector>
 
-typedef uint8_t Square;
-typedef uint64_t BitBoard;
+typedef int8_t Square;
+typedef int64_t BitBoard;
 
 enum PieceTypes {
     KNIGHT,
@@ -15,15 +15,20 @@ enum PieceTypes {
 };
 typedef enum PieceTypes PieceType;
 class Move {
-    private:
+    public:
         Square OgSquare;
         Square NewSquare;
         PieceType MovedPiece;
+        
+        Move(Square os, Square ns, PieceType mp) {
+            OgSquare = os; NewSquare = ns; MovedPiece = mp;
+        }
 };
 typedef std::vector<Move> MoveList;
 class Piece {
     public:
         Square PieceSquare;
+        const PieceType Type;
         bool Has_Moved;
 
         BitBoard Attacks;
@@ -31,9 +36,6 @@ class Piece {
 
         BitBoard ValidSquares;
         //For absolute pins and (presumably) other stuff
-
-    private:
-        char type;
 };
 
 class Side {
@@ -64,11 +66,11 @@ namespace SquareFuncs{
     BitBoard GetLimitingBB(Position CurPosition, Piece ThePiece) {
         Square PieceSquare = ThePiece.PieceSquare;
 
-        BitBoard OpposingBB = (CurPosition.White.PieceLocations & GetBBSpot(PieceSquare))
-         ? CurPosition.White.PieceLocations : CurPosition.Black.PieceLocations;
+        Side OpposingSide = (CurPosition.White.PieceLocations & GetBBSpot(PieceSquare))
+         ? CurPosition.White : CurPosition.Black;
         //Note to self: if the piece locations are imprecise this function gets screwed up
         
-        return OpposingBB & ThePiece.ValidSquares;
+        return OpposingSide.PieceLocations & ThePiece.ValidSquares & OpposingSide.GlobalValidSquares;
     }
 }
 namespace LegalMoves
@@ -77,7 +79,32 @@ namespace LegalMoves
         free(ptr); ptr = NewMoves;
     }
 
-    void GetKnightMoves(Piece ThePiece, Position CurPosition) {
+    void RegisterMove(Piece ThePiece, Square TargetSquare, MoveList* PossibleMoves) {
+
+        Move NewMove(ThePiece.PieceSquare, TargetSquare, ThePiece.Type);
+        PossibleMoves->push_back(NewMove);
+
+    }
+
+    void GetKnightMoves(Piece ThePiece, Position CurPosition, bool RegisterMoves) {
+        Square OgSquare = ThePiece.PieceSquare;
+        
+        for (int a = -1; a<2; a=a+2) {
+            for (int b = -1; b<2; b=b+2) {
+                Square PotentialSquare1 = (Square)((16 * a) + b + OgSquare);
+                Square PotentialSquare2 = (Square)((16 * b) + a + OgSquare);
+
+                if (SquareFuncs::DoesSquareExist(PotentialSquare1)) {
+                    RegisterMove(ThePiece, PotentialSquare1, ThePiece.PossibleMoves);
+                }
+                if (SquareFuncs::DoesSquareExist(PotentialSquare2)) {
+                    RegisterMove(ThePiece, PotentialSquare2, ThePiece.PossibleMoves);
+                }
+            }
+        }
+    }
+
+    void GetBishopMoves() {
         
     }
 }
