@@ -2,8 +2,8 @@
 #include <vector>
 #include <cmath>
 
-typedef int8_t Square;
-typedef int64_t BitBoard;
+typedef short signed int Square;
+typedef long long BitBoard;
 
 enum PieceTypes {
     KNIGHT,
@@ -102,21 +102,9 @@ namespace BBFuncs{
     }
 
     BitBoard GetKnightMask(Square OgSquare) {
-        BitBoard Mask = 0;
+        BitBoard Mask = 0x50880110A;
 
-        for (int a = -1; a<2; a=a+2) {
-            for (int b = -1; b<2; b=b+2) {
-                Square PotentialSquare1 = (Square)((16 * a) + b + OgSquare);
-                Square PotentialSquare2 = (Square)((16 * b) + a + OgSquare);
-
-                if (SquareFuncs::DoesSquareExist(PotentialSquare1)) {
-                    //RegisterMove(ThePiece, PotentialSquare1, ThePiece.PossibleMoves);
-                }
-                if (SquareFuncs::DoesSquareExist(PotentialSquare2)) {
-                    //RegisterMove(ThePiece, PotentialSquare2, ThePiece.PossibleMoves);
-                }
-            }
-        }
+        return Mask << OgSquare - 1;
     }
 
 }
@@ -133,22 +121,28 @@ namespace LegalMoves
 
     }
 
-    void GetKnightMoves(Piece ThePiece, Position CurPosition) {
-        Square OgSquare = ThePiece.PieceSquare;
+    void GetKnightMoves(Square OgSquare) {
+        BitBoard val = 0;
         
         for (int a = -1; a<2; a=a+2) {
             for (int b = -1; b<2; b=b+2) {
                 Square PotentialSquare1 = (Square)((16 * a) + b + OgSquare);
-                Square PotentialSquare2 = (Square)((16 * b) + a + OgSquare);
+                Square PotentialSquare2 = (Square)((8 * a) + (b * 2) + OgSquare);
 
                 if (SquareFuncs::DoesSquareExist(PotentialSquare1)) {
                     std::cout << PotentialSquare1 << std::endl;
+                    val |= (1 << PotentialSquare1 - 1);
+                    std::cout << val << std::endl;
                 }
                 if (SquareFuncs::DoesSquareExist(PotentialSquare2)) {
-                    std::cout << PotentialSquare1 << std::endl;
+                    std::cout << PotentialSquare2 << std::endl;
+                    val |= (1 << PotentialSquare2 - 1);
+                    std::cout << val << std::endl;
                 }
             }
         }
+
+        std::cout << val << std::endl;
     }
 
     void GetBishopMoves(Piece ThePiece, Position CurPosition) {
