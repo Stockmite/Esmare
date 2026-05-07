@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <cmath>
 
 typedef int8_t Square;
 typedef int64_t BitBoard;
@@ -73,6 +74,18 @@ namespace SquareFuncs{
         return OpposingSide.PieceLocations & ThePiece.ValidSquares & OpposingSide.GlobalValidSquares;
     }
 }
+
+namespace BBFuncs{
+
+    BitBoard GetRookMask(Piece ThePiece) {
+        int PieceFile = ThePiece.PieceSquare % 8;
+        int PieceLine = (ThePiece.PieceSquare - PieceFile) / 8;
+
+        //The mask is initialized to the horizontal squares the rook can move to
+        BitBoard Mask = (255 - (int)pow(2, 8 - PieceFile)) << (PieceLine * 8);
+    }
+
+}
 namespace LegalMoves
 {
     void AssignMoveList(MoveList* ptr, MoveList* NewMoves) {
@@ -86,7 +99,7 @@ namespace LegalMoves
 
     }
 
-    void GetKnightMoves(Piece ThePiece, Position CurPosition, bool RegisterMoves) {
+    void GetKnightMoves(Piece ThePiece, Position CurPosition) {
         Square OgSquare = ThePiece.PieceSquare;
         
         for (int a = -1; a<2; a=a+2) {
@@ -104,7 +117,9 @@ namespace LegalMoves
         }
     }
 
-    void GetBishopMoves() {
+    void GetBishopMoves(Piece ThePiece, Position CurPosition) {
         
+        
+
     }
 }
