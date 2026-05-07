@@ -77,12 +77,46 @@ namespace SquareFuncs{
 
 namespace BBFuncs{
 
-    BitBoard GetRookMask(Piece ThePiece) {
-        int PieceFile = ThePiece.PieceSquare % 8;
-        int PieceLine = (ThePiece.PieceSquare - PieceFile) / 8;
+    BitBoard GetAllFileSquares(short unsigned int file) {
+
+        BitBoard FileSquares = SquareFuncs::GetBBSpot(file);
+
+        for (int line = 0; line < 7; line++) {
+            BitBoard LineSquare = FileSquares << 8;
+            FileSquares |= LineSquare;
+        }
+
+        return FileSquares;
+
+    }
+
+    BitBoard GetRookMask(Square OgSquare) {
+        int PieceFile = OgSquare % 8;
+        int PieceLine = (OgSquare - PieceFile) / 8;
 
         //The mask is initialized to the horizontal squares the rook can move to
-        BitBoard Mask = (255 - (int)pow(2, 8 - PieceFile)) << (PieceLine * 8);
+        BitBoard Mask = 255 << PieceLine * 8;
+        Mask |= GetAllFileSquares(PieceFile);
+
+        return Mask ^ SquareFuncs::GetBBSpot(OgSquare);
+    }
+
+    BitBoard GetKnightMask(Square OgSquare) {
+        BitBoard Mask = 0;
+
+        for (int a = -1; a<2; a=a+2) {
+            for (int b = -1; b<2; b=b+2) {
+                Square PotentialSquare1 = (Square)((16 * a) + b + OgSquare);
+                Square PotentialSquare2 = (Square)((16 * b) + a + OgSquare);
+
+                if (SquareFuncs::DoesSquareExist(PotentialSquare1)) {
+                    //RegisterMove(ThePiece, PotentialSquare1, ThePiece.PossibleMoves);
+                }
+                if (SquareFuncs::DoesSquareExist(PotentialSquare2)) {
+                    //RegisterMove(ThePiece, PotentialSquare2, ThePiece.PossibleMoves);
+                }
+            }
+        }
     }
 
 }
@@ -108,10 +142,10 @@ namespace LegalMoves
                 Square PotentialSquare2 = (Square)((16 * b) + a + OgSquare);
 
                 if (SquareFuncs::DoesSquareExist(PotentialSquare1)) {
-                    RegisterMove(ThePiece, PotentialSquare1, ThePiece.PossibleMoves);
+                    std::cout << PotentialSquare1 << std::endl;
                 }
                 if (SquareFuncs::DoesSquareExist(PotentialSquare2)) {
-                    RegisterMove(ThePiece, PotentialSquare2, ThePiece.PossibleMoves);
+                    std::cout << PotentialSquare1 << std::endl;
                 }
             }
         }
