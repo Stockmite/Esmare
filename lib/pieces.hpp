@@ -101,10 +101,26 @@ namespace BBFuncs{
         return Mask ^ SquareFuncs::GetBBSpot(OgSquare);
     }
 
-    BitBoard GetKnightMask(Square OgSquare) {
+    BitBoard GetKnightMask(Square OgSquare) {    
+
         BitBoard Mask = 0x50880110A;
 
-        return Mask << OgSquare - 1;
+        short int dif = (OgSquare - 19);
+        //The mask is initially situated at c3, then shifted accordingly
+
+        return (dif >= 0) ? Mask << dif : Mask >> abs(dif);
+    }
+
+    BitBoard GetKingMask(Square OgSquare) {
+        BitBoard Mask = 0x70507;
+
+        short int dif = (OgSquare - 10);
+
+        return (dif >= 0) ? Mask << OgSquare - 1 : Mask >> OgSquare - 1;
+    }
+
+    BitBoard GetBishopMask() {
+        
     }
 
 }
@@ -121,33 +137,4 @@ namespace LegalMoves
 
     }
 
-    void GetKnightMoves(Square OgSquare) {
-        BitBoard val = 0;
-        
-        for (int a = -1; a<2; a=a+2) {
-            for (int b = -1; b<2; b=b+2) {
-                Square PotentialSquare1 = (Square)((16 * a) + b + OgSquare);
-                Square PotentialSquare2 = (Square)((8 * a) + (b * 2) + OgSquare);
-
-                if (SquareFuncs::DoesSquareExist(PotentialSquare1)) {
-                    std::cout << PotentialSquare1 << std::endl;
-                    val |= (1 << PotentialSquare1 - 1);
-                    std::cout << val << std::endl;
-                }
-                if (SquareFuncs::DoesSquareExist(PotentialSquare2)) {
-                    std::cout << PotentialSquare2 << std::endl;
-                    val |= (1 << PotentialSquare2 - 1);
-                    std::cout << val << std::endl;
-                }
-            }
-        }
-
-        std::cout << val << std::endl;
-    }
-
-    void GetBishopMoves(Piece ThePiece, Position CurPosition) {
-        
-        
-
-    }
 }
