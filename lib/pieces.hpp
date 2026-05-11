@@ -2,6 +2,8 @@
 #include <vector>
 #include <cmath>
 
+#include "MiscellaneousData\MaskOmmiter.hpp"
+
 typedef short signed int Square;
 typedef long long BitBoard;
 
@@ -101,22 +103,30 @@ namespace BBFuncs{
         return Mask ^ SquareFuncs::GetBBSpot(OgSquare);
     }
 
-    BitBoard GetKnightMask(Square OgSquare) {    
+    BitBoard GetKnightMask(Square OgSquare) { 
+        int PieceFile = OgSquare % 8;
+        int PieceLine = (OgSquare - PieceFile) / 8;  
 
         BitBoard Mask = 0x50880110A;
 
         short int dif = (OgSquare - 19);
         //The mask is initially situated at c3, then shifted accordingly
 
-        return (dif >= 0) ? Mask << dif : Mask >> abs(dif);
+        Mask = (dif >= 0) ? Mask << OgSquare - 1 : Mask >> OgSquare - 1;
+
+        return Mask ^ HorizontalOmmiter[PieceFile] ^ VerticalOmmiter[PieceLine];
     }
 
     BitBoard GetKingMask(Square OgSquare) {
+        int PieceFile = OgSquare % 8;
+        int PieceLine = (OgSquare - PieceFile) / 8;
+
         BitBoard Mask = 0x70507;
 
         short int dif = (OgSquare - 10);
+        Mask = (dif >= 0) ? Mask << OgSquare - 1 : Mask >> OgSquare - 1;
 
-        return (dif >= 0) ? Mask << OgSquare - 1 : Mask >> OgSquare - 1;
+        return Mask ^ HorizontalOmmiter[PieceFile] ^ VerticalOmmiter[PieceLine];
     }
 
     BitBoard GetBishopMask() {
