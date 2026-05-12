@@ -129,8 +129,35 @@ namespace BBFuncs{
         return Mask ^ HorizontalOmmiter[PieceFile] ^ VerticalOmmiter[PieceLine];
     }
 
-    BitBoard GetBishopMask() {
-        
+    BitBoard GetBishopMask(Square OgSquare) {
+        int PieceFile = OgSquare % 8;
+
+        BitBoard Diagonal1, Diagonal2 = SquareFuncs::GetBBSpot(OgSquare);
+
+        BitBoard BufVal = Diagonal1;
+
+        for (int ind = 0; ind < (8 - PieceFile); ind++) {
+            Diagonal1 |= (BufVal) << ((9 * ind) + (ind * (ind + 1) / 2));
+        }
+
+        for (int ind = 0; ind < PieceFile; ind++) {
+            Diagonal1 |= (BufVal) >> ((9 * ind) + (ind * (ind + 1) / 2));
+        }
+
+        for (int ind = 0; ind < (8 - PieceFile); ind++) {
+            Diagonal2 |= (BufVal) << ((7 * ind) + (ind * (ind + 1) / 2));
+        }
+
+        for (int ind = 0; ind < PieceFile; ind++) {
+            Diagonal2 |= (BufVal) >> ((7 * ind) + (ind * (ind + 1) / 2));
+        }
+
+        return (Diagonal2 | Diagonal1) ^ BufVal;
+
+    }
+
+    BitBoard GetQueenMask(Square OgSquare) {
+        return GetBishopMask(OgSquare) | GetRookMask(OgSquare);
     }
 
 }
