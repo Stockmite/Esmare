@@ -6,6 +6,7 @@
 
 typedef short signed int Square;
 typedef long long BitBoard;
+typedef bool color;
 
 enum PieceTypes {
     KNIGHT,
@@ -171,6 +172,38 @@ namespace LegalMoves
 
         Move NewMove(ThePiece.PieceSquare, TargetSquare, ThePiece.Type);
         PossibleMoves->push_back(NewMove);
+
+    }
+
+    int getPopCount(BitBoard Mask){
+
+        if (Mask == 0) {return 0;}
+        else if ((Mask & (Mask-1)) == 0) {return 1;}
+
+        int count = 0;
+        while (Mask) {
+            count++;
+            Mask &= Mask - 1;
+        }
+        return count;
+
+    }
+
+    //TODO: Implement bitboard techniques to deal with varying circumnstances and 
+    //edge cases in the chessboard
+    void GetMovesFromMask(Piece ThePiece, BitBoard Mask, MoveList* MoveBuf){
+
+        for (Square n = 0; n < 64; n++) {
+
+            if ((Mask >> n) & 1) {
+                RegisterMove(ThePiece, n, MoveBuf);
+            }
+
+        }
+
+    }
+
+    MoveList GetLegalMoves(color Side, Position CurPosition) {
 
     }
 
