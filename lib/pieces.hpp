@@ -205,6 +205,8 @@ namespace LegalMoves
 
     MoveList GetLegalMoves(color Side, Position CurPosition) {
 
+        
+
     }
 
 }
