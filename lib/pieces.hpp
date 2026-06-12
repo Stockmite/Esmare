@@ -80,6 +80,10 @@ namespace SquareFuncs{
 
 namespace BBFuncs{
 
+    BitBoard GetLSB(BitBoard Mask) {return Mask & -Mask;}
+
+    BitBoard RemoveLSB(BitBoard Mask) {return Mask & (Mask - 1);}
+
     BitBoard GetAllFileSquares(short unsigned int file) {
 
         BitBoard FileSquares = SquareFuncs::GetBBSpot(file);
@@ -161,6 +165,20 @@ namespace BBFuncs{
         return GetBishopMask(OgSquare) | GetRookMask(OgSquare);
     }
 
+    int getPopCount(BitBoard Mask){
+
+        if (Mask == 0) {return 0;}
+        else if (RemoveLSB(Mask) == 0) {return 1;}
+
+        int count = 0;
+        while (Mask) {
+            count++;
+            RemoveLSB(Mask);
+        }
+        return count;
+
+    }
+
 }
 namespace LegalMoves
 {
@@ -175,31 +193,39 @@ namespace LegalMoves
 
     }
 
-    int getPopCount(BitBoard Mask){
-
-        if (Mask == 0) {return 0;}
-        else if ((Mask & (Mask-1)) == 0) {return 1;}
-
-        int count = 0;
-        while (Mask) {
-            count++;
-            Mask &= Mask - 1;
-        }
-        return count;
-
-    }
-
     //TODO: Implement bitboard techniques to deal with varying circumnstances and 
     //edge cases in the chessboard
     void GetMovesFromMask(Piece ThePiece, BitBoard Mask, MoveList* MoveBuf){
 
-        for (Square n = 0; n < 64; n++) {
+        while (Mask) {
 
-            if ((Mask >> n) & 1) {
-                RegisterMove(ThePiece, n, MoveBuf);
-            }
+            Square MoveSquare = log2(Mask & -Mask); //LSB of mask
 
+            RegisterMove(ThePiece, MoveSquare, MoveBuf);
+            Mask &= Mask - 1;
         }
+
+    }
+
+    short int GetSquareMagicBBIndex(BitBoard SquareMask, BitBoard BlockerMask) {
+
+        short int index = 0;
+        short int spot = 0;
+
+        while (SquareMask) {
+
+            BitBoard bit = BBFuncs::GetLSB(SquareMask); //Extract LSB
+            index |= ((bool)(bit & BlockerMask) << spot);
+            spot++;
+
+            SquareMask = BBFuncs::RemoveLSB(SquareMask);
+        }
+
+    }
+
+    MoveList ** CreateSlidingMovesArray() {
+
+
 
     }
 

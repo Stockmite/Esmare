@@ -20,3 +20,5 @@ const unsigned long long VerticalOmmiter[8] = {
   0xFFFF,
   0xFFFFFF
 };
+
+const unsigned long long BoardEdge = 0xFF818181818181FF;
