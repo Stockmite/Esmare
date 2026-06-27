@@ -100,6 +100,18 @@ namespace SquareFuncs{
         
         return OpposingSide.PieceLocations & ThePiece.ValidSquares & OpposingSide.GlobalValidSquares;
     }
+
+    bool OutOfBounds(Square NS, Square OS) {
+
+        auto file = [](Square s) {return ((s-1)%8)+1;};
+        auto rank = [](Square s) {return (s - ((s-1)%8)-1)/8;};
+
+        short int file_distance = abs(file(NS) - file(OS));
+        short int rank_distance = abs(rank(NS) - rank(OS));
+
+        return (file_distance > 2 || rank_distance > 2);
+
+    }
 }
 
 namespace BitFuncs {
@@ -166,29 +178,35 @@ namespace BBFuncs{
     }
 
     BitBoard GetKnightMask(Square OgSquare) { 
-        int PieceFile = OgSquare % 8;
-        int PieceLine = (OgSquare - PieceFile) / 8;  
+        BitBoard Mask = 0;
 
-        BitBoard Mask = 0x50880110A;
+        int SquareShifts[8] = {-15, -6, 10, 17, 15, 6, -10, -17};
 
-        short int dif = (OgSquare - 19);
-        //The mask is initially situated at c3, then shifted accordingly
+        for (auto shift : SquareShifts) {
 
-        Mask = (dif >= 0) ? Mask << OgSquare - 1 : Mask >> OgSquare - 1;
+            if (!SquareFuncs::OutOfBounds(OgSquare+shift, OgSquare)) {
+                Mask |= SquareFuncs::GetBBSpot(OgSquare+shift);
+            }
 
-        //return Mask ^ HorizontalOmmiter[PieceFile] ^ VerticalOmmiter[PieceLine];
+        }
+
+        return Mask;
     }
 
     BitBoard GetKingMask(Square OgSquare) {
-        int PieceFile = OgSquare % 8;
-        int PieceLine = (OgSquare - PieceFile) / 8;
+        BitBoard Mask = 0;
 
-        BitBoard Mask = 0x70507;
+        int SquareShifts[8] = {7, 8, 9, -1, 1, -9, -8, -7};
 
-        short int dif = (OgSquare - 10);
-        Mask = (dif >= 0) ? Mask << OgSquare - 1 : Mask >> OgSquare - 1;
+        for (auto shift : SquareShifts) {
 
-        //return Mask ^ HorizontalOmmiter[PieceFile] ^ VerticalOmmiter[PieceLine];
+            if (!SquareFuncs::OutOfBounds(OgSquare+shift, OgSquare)) {
+                Mask |= SquareFuncs::GetBBSpot(OgSquare+shift);
+            }
+
+        }
+
+        return Mask;
     }
 
     BitBoard GetBishopMask(Square OgSquare) {
@@ -209,11 +227,9 @@ namespace SlidingPieceMoves {
 
         BitBoard Aim = 0;
 
-        auto file = [](Square s) {return ((s-1)%8)+1;};
-        auto rank = [](Square s) {return (s - ((s-1)%8)-1)/8;};
-
         bool AttackBlocked = false;
         bool OutOfBounds = false;
+
         Square OgSquare = TheSquare;
 
         while (!AttackBlocked && !OutOfBounds) {
@@ -225,10 +241,7 @@ namespace SlidingPieceMoves {
 
             AttackBlocked = Spot & BlockerMask;
 
-            short int file_distance = abs(file(NewS) - file(TheSquare));
-            short int rank_distance = abs(rank(NewS) - rank(TheSquare));
-
-            OutOfBounds = (file_distance > 2 || rank_distance > 2);
+            OutOfBounds = SquareFuncs::OutOfBounds(NewS, TheSquare);
             TheSquare = NewS;
 
         }
